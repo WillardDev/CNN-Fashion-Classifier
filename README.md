@@ -30,6 +30,9 @@ Use a CNN when:
 ## Repository contents
 
 - `fashion_mnist_cnn.ipynb` — the main notebook implementing the full workflow.
+- `app.py` — Streamlit web app for classifying uploaded clothing photos.
+- `requirements.txt` — all dependencies for both the notebook and the app.
+- `samples/` — example clothing photos to try.
 
 ## Notebook workflow
 
@@ -49,31 +52,66 @@ The notebook follows this guideline checklist:
    regularisation.
 6. **Evaluation metrics** — Accuracy, Precision, Recall, F1, ROC-AUC, plus
    train/validation loss and accuracy curves.
-7. **Error analysis** — inspect misclassified examples and the confusion matrix
-   to decide whether labels, augmentation or architecture need adjustment.
+7. **Error analysis & reduction** — rank confusion pairs, check prediction
+   confidence, inspect misclassified examples, then reduce errors with
+   test-time augmentation and targeted fine-tuning.
 8. **Summary** — pros/cons and real-world examples.
 
 ## Requirements
 
 - Python 3.9+
-- TensorFlow (>= 2.6)
-- NumPy, Pandas, Matplotlib, Seaborn
+- TensorFlow (>= 2.15)
+- Streamlit (>= 1.35)
+- NumPy, Pandas, Pillow, Altair, Matplotlib, Seaborn
 - scikit-learn
 
-Install dependencies:
+Homebrew's Python is externally managed (PEP 668), so install everything into a
+project virtual environment:
 
 ```bash
-pip install tensorflow numpy pandas matplotlib seaborn scikit-learn
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Register the environment as a Jupyter kernel so the notebook can use it:
+
+```bash
+python -m ipykernel install --user --name fashion-cnn --display-name "Fashion CNN (.venv)"
 ```
 
 ## Running the notebook
 
 ```bash
+source .venv/bin/activate
 jupyter notebook fashion_mnist_cnn.ipynb
 ```
 
-or, in VS Code, open the notebook and run all cells. The dataset is downloaded
-automatically by TensorFlow/Keras on first run.
+or, in VS Code, open the notebook and select the **Fashion CNN (.venv)**
+kernel. The dataset is downloaded automatically by TensorFlow/Keras on first
+run.
+
+## Streamlit app
+
+The app lets you upload a clothing photo (or pick one from `samples/`) and
+shows the predicted class, its confidence, and a bar chart of the top-3 class
+probabilities.
+
+1. Train the model in the notebook and run the **Save the trained model** cell
+   (creates `fashion_cnn.keras`).
+2. Start the app:
+
+```bash
+source .venv/bin/activate
+streamlit run app.py
+```
+
+3. Open http://localhost:8501 in your browser.
+
+The app automatically crops the item, pads it to a square, resizes to 28×28 and
+inverts bright backgrounds so external photos match the Fashion MNIST training
+style. If TensorFlow or the saved model is missing, the app shows setup
+instructions instead of crashing.
 
 ## Expected results
 
